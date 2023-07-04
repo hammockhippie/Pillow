@@ -73,7 +73,19 @@ def test_equal(mode):
     assert img_a.im == img_b.im
 
 
-@pytest.mark.parametrize("mode", mode_names_not_bgr)
+# With mode "1" different bytes can map to the same value,
+# so we have to be more specific with the values we use.
+def test_not_equal_mode_1():
+    data_a = data_b = "".join(secrets.choice(0x00, 0xFF) for i in range(4))
+    while data_a == data_b:
+        data_b = "".join(secrets.choice(0x00, 0xFF) for i in range(4))
+    img_a = Image.frombytes("1", (2, 2), data_a)
+    img_b = Image.frombytes("1", (2, 2), data_b)
+    assert img_a.tobytes() != img_b.tobytes()
+    assert img_a.im != img_b.im
+
+
+@pytest.mark.parametrize("mode", [mode for mode in mode_names_not_bgr if mode != "1"])
 def test_not_equal(mode):
     num_img_bytes = len(Image.new(mode, (2, 2)).tobytes())
     # alternatively, random.randbytes() in Python 3.9
