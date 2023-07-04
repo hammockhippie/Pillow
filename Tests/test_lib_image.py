@@ -76,9 +76,9 @@ def test_equal(mode):
 # With mode "1" different bytes can map to the same value,
 # so we have to be more specific with the values we use.
 def test_not_equal_mode_1():
-    data_a = data_b = "".join(secrets.choice(0x00, 0xFF) for i in range(4))
+    data_a = data_b = bytes(secrets.choice(b"\x00\xff") for i in range(4))
     while data_a == data_b:
-        data_b = "".join(secrets.choice(0x00, 0xFF) for i in range(4))
+        data_b = bytes(secrets.choice(b"\x00\xff") for i in range(4))
     img_a = Image.frombytes("1", (2, 2), data_a)
     img_b = Image.frombytes("1", (2, 2), data_b)
     assert img_a.tobytes() != img_b.tobytes()
