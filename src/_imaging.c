@@ -3745,8 +3745,6 @@ _compare_pixels(
         mask = 0xff0000ff;
     }
 
-    PyErr_Format(PyExc_Exception, "mode mask : %s 0x%08x", mode, mask);
-
     if (mask == 0xffffffff) {
         // If we aren't masking anything we can use memcmp.
         for (int y = 0; y < ysize; y++) {
@@ -3761,15 +3759,6 @@ _compare_pixels(
             UINT32 *line_b = (UINT32*)pixels_b[y];
             for (int x = 0; x < xsize; x++, line_a++, line_b++) {
                 if ((*line_a & mask) != (*line_b & mask)) {
-                    PyErr_Format(
-                        PyExc_Exception,
-                        "line %i index %i value a b mask : 0x%08x 0x%08x 0x%08x",
-                        y,
-                        x,
-                        *line_a,
-                        *line_b,
-                        mask
-                    );
                     return 1;
                 }
             }
@@ -3792,14 +3781,6 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
     const Imaging img_a = self->image;
     const Imaging img_b = ((ImagingObject*)other)->image;
 
-    PyErr_Format(
-        PyExc_Exception,
-        "a mode, b mode, diff : %s %s %i",
-        img_a->mode,
-        img_b->mode,
-        strcmp(img_a->mode, img_a->mode)
-    );
-
     if (
         strcmp(img_a->mode, img_b->mode)
         || img_a->xsize != img_b->xsize
@@ -3811,14 +3792,6 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
     const ImagingPalette palette_a = img_a->palette;
     const ImagingPalette palette_b = img_b->palette;
     if (palette_a || palette_b) {
-        PyErr_Format(
-            PyExc_Exception,
-            "pa mode, pb mode, diff : %s %s %i",
-            palette_a->mode,
-            palette_b->mode,
-            strcmp(palette_a->mode, palette_b->mode)
-        );
-
         const UINT8 *palette_a_data = palette_a->palette;
         const UINT8 *palette_b_data = palette_b->palette;
         const UINT8 **palette_a_data_ptr = &palette_a_data;
@@ -3839,13 +3812,6 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
         }
     }
 
-    PyErr_Format(
-        PyExc_Exception,
-        "linesize a b : %i %i",
-        img_a->linesize,
-        img_b->linesize
-    );
-
     if (_compare_pixels(
             img_a->mode,
             img_a->ysize,
@@ -3853,10 +3819,8 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
             (const UINT8 **)img_a->image,
             (const UINT8 **)img_b->image)
     ) {
-        PyErr_Clear();
         return op == Py_EQ ? Py_False : Py_True;
     } else {
-        PyErr_Clear();
         return op == Py_EQ ? Py_True : Py_False;
     }
 }
