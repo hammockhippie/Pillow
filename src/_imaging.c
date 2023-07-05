@@ -3777,7 +3777,11 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
 
     // If the other object is not an ImagingObject.
     if (!PyImaging_Check(other)) {
-        return op == Py_EQ ? Py_False : Py_True;
+        if (op == Py_EQ) {
+            Py_RETURN_FALSE;
+        } else {
+            Py_RETURN_TRUE;
+        }
     }
 
     const Imaging img_a = self->image;
@@ -3788,7 +3792,11 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
         || img_a->xsize != img_b->xsize
         || img_a->ysize != img_b->ysize
     ) {
-        return op == Py_EQ ? Py_False : Py_True;
+        if (op == Py_EQ) {
+            Py_RETURN_FALSE;
+        } else {
+            Py_RETURN_TRUE;
+        }
     }
 
     const ImagingPalette palette_a = img_a->palette;
@@ -3810,20 +3818,34 @@ image_richcompare(const ImagingObject *self, const PyObject *other, const int op
                 palette_b_data_ptr
             )
         ) {
-            return op == Py_EQ ? Py_False : Py_True;
+            if (op == Py_EQ) {
+                Py_RETURN_FALSE;
+            } else {
+                Py_RETURN_TRUE;
+            }
         }
     }
 
-    if (_compare_pixels(
+    if (
+        _compare_pixels(
             img_a->mode,
             img_a->ysize,
             img_a->linesize,
             (const UINT8 **)img_a->image,
-            (const UINT8 **)img_b->image)
+            (const UINT8 **)img_b->image
+        )
     ) {
-        return op == Py_EQ ? Py_False : Py_True;
+        if (op == Py_EQ) {
+            Py_RETURN_FALSE;
+        } else {
+            Py_RETURN_TRUE;
+        }
     } else {
-        return op == Py_EQ ? Py_True : Py_False;
+        if (op == Py_EQ) {
+            Py_RETURN_TRUE;
+        } else {
+            Py_RETURN_FALSE;
+        }
     }
 }
 
