@@ -3747,17 +3747,19 @@ _compare_pixels(
 
     if (mask == 0xffffffff) {
         // If we aren't masking anything we can use memcmp.
-        for (int y = 0; y < ysize; y++) {
+        int y;
+        for (y = 0; y < ysize; y++) {
             if (memcmp(pixels_a[y], pixels_b[y], linesize)) {
                 return 1;
             }
         }
     } else {
         const int xsize = linesize / 4;
-        for (int y = 0; y < ysize; y++) {
+        int y, x;
+        for (y = 0; y < ysize; y++) {
             UINT32 *line_a = (UINT32*)pixels_a[y];
             UINT32 *line_b = (UINT32*)pixels_b[y];
-            for (int x = 0; x < xsize; x++, line_a++, line_b++) {
+            for (x = 0; x < xsize; x++, line_a++, line_b++) {
                 if ((*line_a & mask) != (*line_b & mask)) {
                     return 1;
                 }
