@@ -79,8 +79,10 @@ def test_not_equal_mode_1():
     data_a = data_b = bytes(secrets.choice(b"\x00\xff") for i in range(4))
     while data_a == data_b:
         data_b = bytes(secrets.choice(b"\x00\xff") for i in range(4))
-    img_a = Image.frombytes("1", (2, 2), data_a)
-    img_b = Image.frombytes("1", (2, 2), data_b)
+    # We need to use rawmode "1;8" so that each full byte is interpreted as a value
+    # instead of the bits in the bytes being interpreted as values.
+    img_a = Image.frombytes("1", (2, 2), data_a, "raw", "1;8")
+    img_b = Image.frombytes("1", (2, 2), data_b, "raw", "1;8")
     assert img_a.tobytes() != img_b.tobytes()
     assert img_a.im != img_b.im
 
