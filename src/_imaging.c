@@ -3733,12 +3733,16 @@ _compare_pixels(
     // Fortunately, all of the modes that have extra bytes in their pixels use four bytes for their pixels.
     UINT32 mask = 0xffffffff;
     if (
-        !strcmp(mode, "RGB") || !strcmp(mode, "RGBX") ||
-        !strcmp(mode, "YCbCr") || !strcmp(mode, "HSV") || !strcmp(mode, "LAB")
+        !strcmp(mode, "RGB") || !strcmp(mode, "YCbCr") ||
+        !strcmp(mode, "HSV") || !strcmp(mode, "LAB")
     ) {
         // These modes have three channels in four bytes,
         // so we have to ignore the last byte.
-        mask ^= 0xff;
+#ifdef WORDS_BIGENDIAN
+        mask = 0xffffff00;
+#else
+        mask = 0x00ffffff;
+#endif
     } else if (!strcmp(mode, "LA") || !strcmp(mode, "La") || !strcmp(mode, "PA")) {
         // These modes have two channels in four bytes,
         // so we have to ignore the middle two bytes.
