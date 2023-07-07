@@ -100,29 +100,23 @@ def test_not_equal(mode):
     assert img_a.im != img_b.im
 
 
-@pytest.mark.parametrize(
-    ("mode", "rawmode"),
-    (("RGB", "RGBX"), ("YCbCr", "YCbCrX"), ("HSV", None), ("LAB", None)),
-)
-def test_equal_three_channels_four_bytes(mode, rawmode):
-    if rawmode is None:
-        pytest.skip("no 4-byte rawmode for " + mode)
-    img_a = Image.frombytes(mode, (2, 2), b"ABC1DEF2GHI3JKL4", "raw", rawmode)
-    img_b = Image.frombytes(mode, (2, 2), b"ABC5DEF6GHI7JKL8", "raw", rawmode)
+@pytest.mark.parametrize("mode", ("RGB", "YCbCr", "HSV", "LAB"))
+def test_equal_three_channels_four_bytes(mode):
+    img_a = Image.new(mode, (2, 2))
+    img_b = Image.new(mode, (2, 2))
+    img_a.im.set_internal_pixel_bytes(b"ABC1DEF2GHI3JKL4")
+    img_b.im.set_internal_pixel_bytes(b"ABC5DEF6GHI7JKL8")
     assert img_a.tobytes() == b"ABCDEFGHIJKL"
     assert img_b.tobytes() == b"ABCDEFGHIJKL"
     assert img_a.im == img_b.im
 
 
-@pytest.mark.skip(reason="no way to directly set C bytes from Python")
 @pytest.mark.parametrize("mode", ("LA", "La", "PA"))
 def test_equal_two_channels_four_bytes(mode):
-    img_a = Image.frombytes("RGBA", (2, 2), b"1AB23CD45EF67GH8")
-    img_b = Image.frombytes("RGBA", (2, 2), b"1IJ23KL45MN67OP8")
-    # this only sets the mode in Python, not C
-    img_a.mode = mode
-    img_b.mode = mode
+    img_a = Image.new(mode, (2, 2))
+    img_b = Image.new(mode, (2, 2))
+    img_a.im.set_internal_pixel_bytes(b"1AB23CD45EF67GH8")
+    img_b.im.set_internal_pixel_bytes(b"1IJ23KL45MN67OP8")
     assert img_a.tobytes() == b"12345678"
     assert img_b.tobytes() == b"12345678"
-    # this fails because the C code still thinks the mode is RGBA
     assert img_a.im == img_b.im
