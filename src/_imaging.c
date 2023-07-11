@@ -3534,34 +3534,6 @@ _save_ppm(ImagingObject *self, PyObject *args) {
     return Py_None;
 }
 
-static PyObject *
-_set_internal_pixel_bytes(ImagingObject *self, PyObject *args) {
-    char *bytes;
-    Py_ssize_t length;
-
-    if (!PyArg_ParseTuple(args, "y#", &bytes, &length)) {
-        return NULL;
-    }
-
-    const int ysize = self->image->ysize;
-    const int linesize = self->image->linesize;
-    const Py_ssize_t expected_bytes = ysize * linesize;
-    if (length != expected_bytes) {
-        return PyErr_Format(
-            PyExc_ValueError, "Expected %i bytes but got %i.",
-            expected_bytes, length
-        );
-    }
-
-    int y;
-    char **image_bytes = self->image->image;
-    for (y = 0; y < ysize; y++, bytes += linesize) {
-        memcpy(image_bytes[y], bytes, linesize);
-    }
-
-    Py_RETURN_NONE;
-}
-
 /* -------------------------------------------------------------------- */
 
 /* methods */
@@ -3663,8 +3635,6 @@ static struct PyMethodDef methods[] = {
     {"new_block", (PyCFunction)_new_block, METH_VARARGS},
 
     {"save_ppm", (PyCFunction)_save_ppm, METH_VARARGS},
-
-    {"set_internal_pixel_bytes", (PyCFunction)_set_internal_pixel_bytes, METH_VARARGS},
 
     {NULL, NULL} /* sentinel */
 };
