@@ -102,27 +102,17 @@ def test_not_equal(mode):
 
 @pytest.mark.parametrize("mode", ("RGB", "YCbCr", "HSV", "LAB"))
 def test_equal_three_channels_four_bytes(mode):
-    img_a = Image.new(mode, (2, 2))
-    img_b = Image.new(mode, (2, 2))
-    if mode != "LAB":
-        img_a.im.set_internal_pixel_bytes(b"ABC1DEF2GHI3JKL4")
-        img_b.im.set_internal_pixel_bytes(b"ABC5DEF6GHI7JKL8")
-    else:
-        # The "A" and "B" values in LAB images are signed values from -128 to 127,
-        # but we store them as unsigned values from 0 to 255.
-        img_a.im.set_internal_pixel_bytes(b"A\xc2\xc31D\xc5\xc62G\xc8\xc93J\xcb\xcc4")
-        img_b.im.set_internal_pixel_bytes(b"A\xc2\xc35D\xc5\xc66G\xc8\xc97J\xcb\xcc8")
-    assert img_a.tobytes() == b"ABCDEFGHIJKL"
-    assert img_b.tobytes() == b"ABCDEFGHIJKL"
+    img_a = Image.new(mode, (1, 1), 0x00B3B231 if mode == "LAB" else 0x00333231)
+    img_b = Image.new(mode, (1, 1), 0xFFB3B231 if mode == "LAB" else 0xFF333231)
+    assert img_a.tobytes() == b"123"
+    assert img_b.tobytes() == b"123"
     assert img_a.im == img_b.im
 
 
 @pytest.mark.parametrize("mode", ("LA", "La", "PA"))
 def test_equal_two_channels_four_bytes(mode):
-    img_a = Image.new(mode, (2, 2))
-    img_b = Image.new(mode, (2, 2))
-    img_a.im.set_internal_pixel_bytes(b"1AB23CD45EF67GH8")
-    img_b.im.set_internal_pixel_bytes(b"1IJ23KL45MN67OP8")
-    assert img_a.tobytes() == b"12345678"
-    assert img_b.tobytes() == b"12345678"
+    img_a = Image.new(mode, (1, 1), 0x32000031)
+    img_b = Image.new(mode, (1, 1), 0x32FFFF31)
+    assert img_a.tobytes() == b"12"
+    assert img_b.tobytes() == b"12"
     assert img_a.im == img_b.im
