@@ -2,7 +2,7 @@
 
 set -e
 
-brew install libtiff libjpeg openjpeg libimagequant webp little-cms2 freetype libraqm
+brew install libtiff libjpeg openjpeg libimagequant webp little-cms2 freetype openblas libraqm dav1d aom rav1e
 export PKG_CONFIG_PATH="/usr/local/opt/openblas/lib/pkgconfig"
 
 # TODO Update condition when cffi supports 3.13
@@ -18,6 +18,9 @@ python3 -m pip install pyroma
 
 # TODO Update condition when NumPy supports 3.13
 if ! [[ "$GHA_PYTHON_VERSION" == "3.13" ]]; then python3 -m pip install numpy ; fi
+
+# libavif
+pushd depends && ./install_libavif.sh && popd
 
 # extra test images
 pushd depends && ./install_extra_test_images.sh && popd
