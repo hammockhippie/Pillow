@@ -1,5 +1,8 @@
+from __future__ import annotations
 import sys
 from io import BytesIO, StringIO
+
+import pytest
 
 from PIL import Image, IptcImagePlugin
 
@@ -44,7 +47,7 @@ def test_getiptcinfo_fotostation():
     for tag in iptc.keys():
         if tag[0] == 240:
             return
-    assert False, "FotoStation tag not found"
+    pytest.fail("FotoStation tag not found")
 
 
 def test_getiptcinfo_zero_padding():

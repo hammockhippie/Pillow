@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import re
 from io import BytesIO
@@ -416,7 +417,7 @@ def test_plt_marker():
     while True:
         marker = out.read(2)
         if not marker:
-            assert False, "End of stream without PLT"
+            pytest.fail("End of stream without PLT")
 
         jp2_boxid = _binary.i16be(marker)
         if jp2_boxid == 0xFF4F:
@@ -426,7 +427,7 @@ def test_plt_marker():
             # PLT
             return
         elif jp2_boxid == 0xFF93:
-            assert False, "SOD without finding PLT first"
+            pytest.fail("SOD without finding PLT first")
 
         hdr = out.read(2)
         length = _binary.i16be(hdr)

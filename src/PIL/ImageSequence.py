@@ -14,6 +14,7 @@
 #
 
 ##
+from __future__ import annotations
 
 
 class Iterator:
@@ -40,7 +41,8 @@ class Iterator:
             self.im.seek(ix)
             return self.im
         except EOFError as e:
-            raise IndexError from e  # end of sequence
+            msg = "end of sequence"
+            raise IndexError(msg) from e
 
     def __iter__(self):
         return self
@@ -51,7 +53,8 @@ class Iterator:
             self.position += 1
             return self.im
         except EOFError as e:
-            raise StopIteration from e
+            msg = "end of sequence"
+            raise StopIteration(msg) from e
 
 
 def all_frames(im, func=None):

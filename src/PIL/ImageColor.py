@@ -16,6 +16,7 @@
 #
 # See the README file for information on usage and redistribution.
 #
+from __future__ import annotations
 
 import re
 
@@ -124,7 +125,7 @@ def getcolor(color, mode):
     """
     Same as :py:func:`~PIL.ImageColor.getrgb` for most modes. However, if
     ``mode`` is HSV, converts the RGB value to a HSV value, or if ``mode`` is
-    not color or a palette image, converts the RGB value to a greyscale value.
+    not color or a palette image, converts the RGB value to a grayscale value.
     If the string cannot be parsed, this function raises a :py:exc:`ValueError`
     exception.
 

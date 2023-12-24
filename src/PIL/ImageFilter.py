@@ -14,6 +14,8 @@
 #
 # See the README file for information on usage and redistribution.
 #
+from __future__ import annotations
+
 import functools
 
 
@@ -222,7 +224,7 @@ class UnsharpMask(MultibandFilter):
 
     .. _digital unsharp masking: https://en.wikipedia.org/wiki/Unsharp_masking#Digital_unsharp_masking
 
-    """  # noqa: E501
+    """
 
     name = "UnsharpMask"
 

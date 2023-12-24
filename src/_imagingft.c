@@ -877,7 +877,7 @@ font_render(FontObject *self, PyObject *args) {
 
     width += stroke_width * 2 + ceil(x_start);
     height += stroke_width * 2 + ceil(y_start);
-    image = PyObject_CallFunction(fill, "s(ii)", strcmp(mode, "RGBA") == 0 ? "RGBA" : "L", width, height);
+    image = PyObject_CallFunction(fill, "ii", width, height);
     if (image == Py_None) {
         PyMem_Del(glyph_info);
         return Py_BuildValue("ii", 0, 0);
@@ -885,7 +885,9 @@ font_render(FontObject *self, PyObject *args) {
         PyMem_Del(glyph_info);
         return NULL;
     }
-    id = PyLong_AsSsize_t(PyObject_GetAttrString(image, "id"));
+    PyObject *imageId = PyObject_GetAttrString(image, "id");
+    id = PyLong_AsSsize_t(imageId);
+    Py_XDECREF(imageId);
     im = (Imaging)id;
 
     x_offset -= stroke_width;
