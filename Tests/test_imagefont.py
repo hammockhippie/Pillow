@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import copy
 import os
 import re
@@ -859,6 +860,19 @@ def test_bitmap_font_stroke(layout_engine):
     assert_image_similar_tofile(im, target, 0.03)
 
 
+@pytest.mark.parametrize("embedded_color", (False, True))
+def test_bitmap_blend(layout_engine, embedded_color):
+    font = ImageFont.truetype(
+        "Tests/fonts/EBDTTestFont.ttf", size=64, layout_engine=layout_engine
+    )
+
+    im = Image.new("RGBA", (128, 96), "white")
+    d = ImageDraw.Draw(im)
+    d.text((16, 16), "AA", font=font, fill="#8E2F52", embedded_color=embedded_color)
+
+    assert_image_equal_tofile(im, "Tests/images/bitmap_font_blend.png")
+
+
 def test_standard_embedded_color(layout_engine):
     txt = "Hello World!"
     ttf = ImageFont.truetype(FONT_PATH, 40, layout_engine=layout_engine)
@@ -897,15 +911,15 @@ def test_float_coord(layout_engine, fontmode):
 def test_cbdt(layout_engine):
     try:
         font = ImageFont.truetype(
-            "Tests/fonts/NotoColorEmoji.ttf", size=109, layout_engine=layout_engine
+            "Tests/fonts/CBDTTestFont.ttf", size=64, layout_engine=layout_engine
         )
 
-        im = Image.new("RGB", (150, 150), "white")
+        im = Image.new("RGB", (128, 96), "white")
         d = ImageDraw.Draw(im)
 
-        d.text((10, 10), "\U0001f469", font=font, embedded_color=True)
+        d.text((16, 16), "AB", font=font, embedded_color=True)
 
-        assert_image_similar_tofile(im, "Tests/images/cbdt_notocoloremoji.png", 6.2)
+        assert_image_equal_tofile(im, "Tests/images/cbdt.png")
     except OSError as e:  # pragma: no cover
         assert str(e) in ("unimplemented feature", "unknown file format")
         pytest.skip("freetype compiled without libpng or CBDT support")
@@ -914,17 +928,15 @@ def test_cbdt(layout_engine):
 def test_cbdt_mask(layout_engine):
     try:
         font = ImageFont.truetype(
-            "Tests/fonts/NotoColorEmoji.ttf", size=109, layout_engine=layout_engine
+            "Tests/fonts/CBDTTestFont.ttf", size=64, layout_engine=layout_engine
         )
 
-        im = Image.new("RGB", (150, 150), "white")
+        im = Image.new("RGB", (128, 96), "white")
         d = ImageDraw.Draw(im)
 
-        d.text((10, 10), "\U0001f469", "black", font=font)
+        d.text((16, 16), "AB", "green", font=font)
 
-        assert_image_similar_tofile(
-            im, "Tests/images/cbdt_notocoloremoji_mask.png", 6.2
-        )
+        assert_image_equal_tofile(im, "Tests/images/cbdt_mask.png")
     except OSError as e:  # pragma: no cover
         assert str(e) in ("unimplemented feature", "unknown file format")
         pytest.skip("freetype compiled without libpng or CBDT support")
@@ -1042,11 +1054,13 @@ def test_too_many_characters(font):
     with pytest.raises(ValueError):
         transposed_font.getlength("A" * 1_000_001)
 
-    default_font = ImageFont.load_default()
+    imagefont = ImageFont.ImageFont()
     with pytest.raises(ValueError):
-        default_font.getlength("A" * 1_000_001)
+        imagefont.getlength("A" * 1_000_001)
     with pytest.raises(ValueError):
-        default_font.getbbox("A" * 1_000_001)
+        imagefont.getbbox("A" * 1_000_001)
+    with pytest.raises(ValueError):
+        imagefont.getmask("A" * 1_000_001)
 
 
 @pytest.mark.parametrize(
