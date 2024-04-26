@@ -724,10 +724,10 @@ class pil_build_ext(build_ext):
         if feature.want("tiff"):
             _dbg("Looking for tiff")
             if _find_include_file(self, "tiff.h"):
-                lib_tiff = _find_library_file(self, "tiff")
-                if sys.platform in ["win32", "darwin"]:
-                    lib_tiff = _find_library_file(self, "libtiff")
-                feature.tiff = lib_tiff
+                feature.tiff = (
+                    sys.platform in ["win32", "darwin"]
+                    and _find_library_file(self, "libtiff")
+                ) or _find_library_file(self, "tiff")
 
         if feature.want("freetype"):
             _dbg("Looking for freetype")
