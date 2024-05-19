@@ -115,6 +115,15 @@ Support for LibTIFF earlier than 4
 Support for LibTIFF earlier than version 4 has been deprecated.
 Upgrade to a newer version of LibTIFF instead.
 
+Non-image modes in ImageCms
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. deprecated:: 10.4.0
+
+The use in ImageCms of input modes and output modes that are not Pillow image
+modes has been deprecated. Defaulting to "L" or "1" if the mode cannot be
+mapped is also deprecated.
+
 Removed features
 ----------------
 
