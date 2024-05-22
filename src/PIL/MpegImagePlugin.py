@@ -14,17 +14,16 @@
 #
 from __future__ import annotations
 
-from io import BytesIO
-
 from . import Image, ImageFile
 from ._binary import i8
+from ._typing import SupportsRead
 
 #
 # Bitstream parser
 
 
 class BitStream:
-    def __init__(self, fp: BytesIO) -> None:
+    def __init__(self, fp: SupportsRead[bytes]) -> None:
         self.fp = fp
         self.bits = 0
         self.bitbuffer = 0
@@ -54,6 +53,10 @@ class BitStream:
         return v
 
 
+def _accept(prefix: bytes) -> bool:
+    return prefix[:4] == b"\x00\x00\x01\xb3"
+
+
 ##
 # Image plugin for MPEG streams.  This plugin can identify a stream,
 # but it cannot read it.
@@ -78,7 +81,7 @@ class MpegImageFile(ImageFile.ImageFile):
 # --------------------------------------------------------------------
 # Registry stuff
 
-Image.register_open(MpegImageFile.format, MpegImageFile)
+Image.register_open(MpegImageFile.format, MpegImageFile, _accept)
 
 Image.register_extensions(MpegImageFile.format, [".mpg", ".mpeg"])
 
