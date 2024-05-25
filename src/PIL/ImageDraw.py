@@ -34,7 +34,7 @@ from __future__ import annotations
 import math
 import numbers
 import struct
-from typing import TYPE_CHECKING, Sequence, cast
+from typing import TYPE_CHECKING, AnyStr, Sequence, cast
 
 from . import Image, ImageColor
 from ._typing import Coords
@@ -120,7 +120,9 @@ class ImageDraw:
             self.font = ImageFont.load_default()
         return self.font
 
-    def _getfont(self, font_size: float | None):
+    def _getfont(
+        self, font_size: float | None
+    ) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
         if font_size is not None:
             from . import ImageFont
 
@@ -453,13 +455,13 @@ class ImageDraw:
                     right[3] -= r + 1
                 self.draw.draw_rectangle(right, ink, 1)
 
-    def _multiline_check(self, text) -> bool:
-        split_character = "\n" if isinstance(text, str) else b"\n"
+    def _multiline_check(self, text: AnyStr) -> bool:
+        split_character = cast(AnyStr, "\n" if isinstance(text, str) else b"\n")
 
         return split_character in text
 
-    def _multiline_split(self, text) -> list[str | bytes]:
-        split_character = "\n" if isinstance(text, str) else b"\n"
+    def _multiline_split(self, text: AnyStr) -> list[AnyStr]:
+        split_character = cast(AnyStr, "\n" if isinstance(text, str) else b"\n")
 
         return text.split(split_character)
 
@@ -472,10 +474,10 @@ class ImageDraw:
 
     def text(
         self,
-        xy,
-        text,
+        xy: tuple[float, float],
+        text: str,
         fill=None,
-        font=None,
+        font: ImageFont.FreeTypeFont | ImageFont.ImageFont | None = None,
         anchor=None,
         spacing=4,
         align="left",
@@ -529,7 +531,7 @@ class ImageDraw:
                 coord.append(int(xy[i]))
                 start.append(math.modf(xy[i])[0])
             try:
-                mask, offset = font.getmask2(
+                mask, offset = font.getmask2(  # type: ignore[union-attr,misc]
                     text,
                     mode,
                     direction=direction,
@@ -545,7 +547,7 @@ class ImageDraw:
                 coord = [coord[0] + offset[0], coord[1] + offset[1]]
             except AttributeError:
                 try:
-                    mask = font.getmask(
+                    mask = font.getmask(  # type: ignore[misc]
                         text,
                         mode,
                         direction,
@@ -594,7 +596,7 @@ class ImageDraw:
 
     def multiline_text(
         self,
-        xy,
+        xy: tuple[float, float],
         text,
         fill=None,
         font=None,
@@ -627,7 +629,7 @@ class ImageDraw:
             font = self._getfont(font_size)
 
         widths = []
-        max_width = 0
+        max_width: float = 0
         lines = self._multiline_split(text)
         line_spacing = self._multiline_spacing(font, spacing, stroke_width)
         for line in lines:
@@ -681,15 +683,15 @@ class ImageDraw:
 
     def textlength(
         self,
-        text,
-        font=None,
+        text: str,
+        font: ImageFont.FreeTypeFont | ImageFont.ImageFont | None = None,
         direction=None,
         features=None,
         language=None,
         embedded_color=False,
         *,
         font_size=None,
-    ):
+    ) -> float:
         """Get the length of a given string, in pixels with 1/64 precision."""
         if self._multiline_check(text):
             msg = "can't measure length of multiline text"
@@ -781,7 +783,7 @@ class ImageDraw:
             font = self._getfont(font_size)
 
         widths = []
-        max_width = 0
+        max_width: float = 0
         lines = self._multiline_split(text)
         line_spacing = self._multiline_spacing(font, spacing, stroke_width)
         for line in lines:

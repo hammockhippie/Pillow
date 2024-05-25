@@ -78,8 +78,6 @@ Constructing images
 ^^^^^^^^^^^^^^^^^^^
 
 .. autofunction:: new
-.. autoclass:: SupportsArrayInterface
-    :show-inheritance:
 .. autofunction:: fromarray
 .. autofunction:: frombytes
 .. autofunction:: frombuffer
@@ -364,6 +362,14 @@ Classes
     :show-inheritance:
 .. autoclass:: PIL.Image.ImagePointHandler
 .. autoclass:: PIL.Image.ImageTransformHandler
+
+Protocols
+---------
+
+.. autoclass:: SupportsArrayInterface
+    :show-inheritance:
+.. autoclass:: SupportsGetData
+    :show-inheritance:
 
 Constants
 ---------

@@ -503,6 +503,12 @@ def _getscaleoffset(expr):
 # Implementation wrapper
 
 
+class SupportsGetData(Protocol):
+    def getdata(
+        self,
+    ) -> tuple[Transform, Sequence[Any]]: ...
+
+
 class Image:
     """
     This class represents an image object.  To create
@@ -1711,7 +1717,12 @@ class Image:
             return self.im.entropy(extrema)
         return self.im.entropy()
 
-    def paste(self, im, box=None, mask=None) -> None:
+    def paste(
+        self,
+        im: Image | str | int | tuple[int, ...],
+        box: tuple[int, int, int, int] | tuple[int, int] | None = None,
+        mask: Image | None = None,
+    ) -> None:
         """
         Pastes another image into this image. The box argument is either
         a 2-tuple giving the upper left corner, a 4-tuple defining the
@@ -2146,7 +2157,13 @@ class Image:
             min(self.size[1], math.ceil(box[3] + support_y)),
         )
 
-    def resize(self, size, resample=None, box=None, reducing_gap=None) -> Image:
+    def resize(
+        self,
+        size: tuple[int, int],
+        resample: int | None = None,
+        box: tuple[float, float, float, float] | None = None,
+        reducing_gap: float | None = None,
+    ) -> Image:
         """
         Returns a resized copy of this image.
 
@@ -2211,13 +2228,13 @@ class Image:
             msg = "reducing_gap must be 1.0 or greater"
             raise ValueError(msg)
 
-        size = tuple(size)
+        size = cast("tuple[int, int]", tuple(size))
 
         self.load()
         if box is None:
             box = (0, 0) + self.size
         else:
-            box = tuple(box)
+            box = cast("tuple[float, float, float, float]", tuple(box))
 
         if self.size == size and box == (0, 0) + self.size:
             return self.copy()
@@ -2252,7 +2269,11 @@ class Image:
 
         return self._new(self.im.resize(size, resample, box))
 
-    def reduce(self, factor, box=None):
+    def reduce(
+        self,
+        factor: int | tuple[int, int],
+        box: tuple[int, int, int, int] | None = None,
+    ) -> Image:
         """
         Returns a copy of the image reduced ``factor`` times.
         If the size of the image is not dividable by ``factor``,
@@ -2271,7 +2292,7 @@ class Image:
         if box is None:
             box = (0, 0) + self.size
         else:
-            box = tuple(box)
+            box = cast("tuple[int, int, int, int]", tuple(box))
 
         if factor == (1, 1) and box == (0, 0) + self.size:
             return self.copy()
@@ -2287,13 +2308,13 @@ class Image:
 
     def rotate(
         self,
-        angle,
-        resample=Resampling.NEAREST,
-        expand=0,
-        center=None,
-        translate=None,
-        fillcolor=None,
-    ):
+        angle: float,
+        resample: int = Resampling.NEAREST,
+        expand: bool = False,
+        center: tuple[int, int] | None = None,
+        translate: tuple[int, int] | None = None,
+        fillcolor: float | tuple[float, ...] | str | None = None,
+    ) -> Image:
         """
         Returns a rotated copy of this image.  This method returns a
         copy of this image, rotated the given number of degrees counter
@@ -2600,7 +2621,12 @@ class Image:
         """
         return 0
 
-    def thumbnail(self, size, resample=Resampling.BICUBIC, reducing_gap=2.0):
+    def thumbnail(
+        self,
+        size: tuple[int, int],
+        resample: int = Resampling.BICUBIC,
+        reducing_gap: float = 2.0,
+    ) -> None:
         """
         Make this image into a thumbnail.  This method modifies the
         image to contain a thumbnail version of itself, no larger than
@@ -2661,20 +2687,22 @@ class Image:
 
         box = None
         if reducing_gap is not None:
-            size = preserve_aspect_ratio()
-            if size is None:
+            preserved_size = preserve_aspect_ratio()
+            if preserved_size is None:
                 return
+            size = preserved_size
 
-            res = self.draft(None, (size[0] * reducing_gap, size[1] * reducing_gap))
+            res = self.draft(None, (size[0] * reducing_gap, size[1] * reducing_gap))  # type: ignore[arg-type]
             if res is not None:
                 box = res[1]
         if box is None:
             self.load()
 
             # load() may have changed the size of the image
-            size = preserve_aspect_ratio()
-            if size is None:
+            preserved_size = preserve_aspect_ratio()
+            if preserved_size is None:
                 return
+            size = preserved_size
 
         if self.size != size:
             im = self.resize(size, resample, box=box, reducing_gap=reducing_gap)
@@ -2690,12 +2718,12 @@ class Image:
     # instead of bloating the method docs, add a separate chapter.
     def transform(
         self,
-        size,
-        method,
-        data=None,
-        resample=Resampling.NEAREST,
-        fill=1,
-        fillcolor=None,
+        size: tuple[int, int],
+        method: Transform | ImageTransformHandler | SupportsGetData,
+        data: Sequence[Any] | None = None,
+        resample: int = Resampling.NEAREST,
+        fill: int = 1,
+        fillcolor: float | tuple[float, ...] | str | None = None,
     ) -> Image:
         """
         Transforms this image.  This method creates a new image with the
@@ -2771,7 +2799,7 @@ class Image:
         im.info = self.info.copy()
         if method == Transform.MESH:
             # list of quads
-            for box, quad in data:
+            for box, quad in cast("Sequence[tuple[float, float]]", data):
                 im.__transformer(
                     box, self, Transform.QUAD, quad, resample, fillcolor is None
                 )
@@ -2929,7 +2957,7 @@ class ImageTransformHandler:
         self,
         size: tuple[int, int],
         image: Image,
-        **options: dict[str, str | int | tuple[int, ...] | list[int]],
+        **options: dict[str, str | int | tuple[int, ...] | list[int]] | int,
     ) -> Image:
         pass
 
