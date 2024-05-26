@@ -64,6 +64,7 @@ _LIB_IMAGING = (
     "Reduce",
     "Bands",
     "BcnDecode",
+    "BcnEncode",
     "BitDecode",
     "Blend",
     "Chops",
