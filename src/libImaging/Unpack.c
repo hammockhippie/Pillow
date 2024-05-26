@@ -104,7 +104,8 @@ static UINT8 BITFLIP[] = {
     3,  131, 67, 195, 35, 163, 99,  227, 19, 147, 83, 211, 51, 179, 115, 243,
     11, 139, 75, 203, 43, 171, 107, 235, 27, 155, 91, 219, 59, 187, 123, 251,
     7,  135, 71, 199, 39, 167, 103, 231, 23, 151, 87, 215, 55, 183, 119, 247,
-    15, 143, 79, 207, 47, 175, 111, 239, 31, 159, 95, 223, 63, 191, 127, 255};
+    15, 143, 79, 207, 47, 175, 111, 239, 31, 159, 95, 223, 63, 191, 127, 255
+};
 
 /* Unpack to "1" image */
 
@@ -867,7 +868,8 @@ unpackRGBa16L(UINT8 *_out, const UINT8 *in, int pixels) {
                 CLIP8(in[1] * 255 / a),
                 CLIP8(in[3] * 255 / a),
                 CLIP8(in[5] * 255 / a),
-                a);
+                a
+            );
         }
         memcpy(_out, &iv, sizeof(iv));
         in += 8;
@@ -891,7 +893,8 @@ unpackRGBa16B(UINT8 *_out, const UINT8 *in, int pixels) {
                 CLIP8(in[0] * 255 / a),
                 CLIP8(in[2] * 255 / a),
                 CLIP8(in[4] * 255 / a),
-                a);
+                a
+            );
         }
         memcpy(_out, &iv, sizeof(iv));
         in += 8;
@@ -915,7 +918,8 @@ unpackRGBa(UINT8 *_out, const UINT8 *in, int pixels) {
                 CLIP8(in[0] * 255 / a),
                 CLIP8(in[1] * 255 / a),
                 CLIP8(in[2] * 255 / a),
-                a);
+                a
+            );
         }
         memcpy(_out, &iv, sizeof(iv));
         in += 4;
@@ -939,7 +943,8 @@ unpackRGBaskip1(UINT8 *_out, const UINT8 *in, int pixels) {
                 CLIP8(in[0] * 255 / a),
                 CLIP8(in[1] * 255 / a),
                 CLIP8(in[2] * 255 / a),
-                a);
+                a
+            );
         }
         in += 5;
     }
@@ -961,7 +966,8 @@ unpackRGBaskip2(UINT8 *_out, const UINT8 *in, int pixels) {
                 CLIP8(in[0] * 255 / a),
                 CLIP8(in[1] * 255 / a),
                 CLIP8(in[2] * 255 / a),
-                a);
+                a
+            );
         }
         in += 6;
     }
@@ -983,7 +989,8 @@ unpackBGRa(UINT8 *_out, const UINT8 *in, int pixels) {
                 CLIP8(in[2] * 255 / a),
                 CLIP8(in[1] * 255 / a),
                 CLIP8(in[0] * 255 / a),
-                a);
+                a
+            );
         }
         memcpy(_out, &iv, sizeof(iv));
         in += 4;
@@ -1014,7 +1021,8 @@ unpackRGBAL(UINT8 *_out, const UINT8 *in, int pixels) {
             in[i],
             in[i + pixels],
             in[i + pixels + pixels],
-            in[i + pixels + pixels + pixels]);
+            in[i + pixels + pixels + pixels]
+        );
         memcpy(_out, &iv, sizeof(iv));
     }
 }
